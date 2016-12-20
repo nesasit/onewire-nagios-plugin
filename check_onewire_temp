@@ -34,29 +34,20 @@ if [ "Z" == "Z$TEMP" ] ; then
   exit 3
 fi
 
-readonly MAX_WARN=75
-readonly MAX_CRIT=80
-readonly MIN_WARN=60
-readonly MIN_CRIT=55
+readonly WARNING=75
+readonly CRITICAL=80
 
 MESSAGE="Current Temp: $TEMP"
+PERF_DATA="temp=$TEMP,$WARNING,$CRITICAL"
 
-if [ $(echo "$TEMP > $MAX_CRIT" | bc) -eq 1 ] ; then
-  echo "CRIT: $MESSAGE"
+if [ $(echo "$TEMP > $CRITICAL" | bc) -eq 1 ] ; then
+  echo "CRIT: $MESSAGE | $PERF_DATA"
   exit 2
 fi
-if [ $(echo "$TEMP > $MAX_WARN" | bc) -eq 1 ] ; then
-  echo "WARN: $MESSAGE"
+if [ $(echo "$TEMP > $WARNING" | bc) -eq 1 ] ; then
+  echo "WARN: $MESSAGE | $PERF_DATA"
   exit 1
 fi
-if [ $(echo "$TEMP < $MIN_CRIT" | bc) -eq 1 ] ; then
-  echo "CRIT: $MESSAGE"
-  exit 2
-fi
-if [ $(echo "$TEMP < $MIN_WARN" | bc) -eq 1 ] ; then
-  echo "WARN: $MESSAGE"
-  exit 1
-fi
-echo "OK: $MESSAGE"
+echo "OK: $MESSAGE | $PERF_DATA"
 exit 0
 
