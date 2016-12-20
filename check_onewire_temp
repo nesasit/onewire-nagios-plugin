@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Local Settings - season to taste
+readonly DIGITEMP_CMD=digitemp_DS9097U         # actual digitemp command to run
+readonly SENSOR_ID=0                           # sensor ID from the config file
+readonly DIGITEMP_CONF=/root/.digitemp.conf    # digitemp config file
+readonly DIGITEMP_DEVICE=/dev/ttyUSB0          # where the sensor is attached
+
 exists()
 {
   command -v "$1" >/dev/null 2>&1
@@ -9,8 +15,24 @@ if ! exists bc ; then
   echo "ERR: bc not installed"
   exit 3
 fi
+if ! exists $DIGITEMP_CMD ; then
+  echo "ERR: $DIGITEMP_CMD not installed"
+  exit 3
+fi
+if ! [ -f $DIGITEMP_CONF ] ; then
+  echo "ERR: $DIGITEMP_CONF not found"
+  exit 3
+fi
+#if ! [ -f $DIGITEMP_DEVICE ] ; then
+#  echo "ERR: $DIGITEMP_DEVICE not found"
+#  exit 3
+#fi
 
-TEMP=$(digitemp_DS9097U -t 0 -q -s /dev/ttyUSB0 -c ./digitemp.conf -o "%.2F")
+readonly TEMP=$($DIGITEMP_CMD -t $SENSOR_ID -q -s $DIGITEMP_DEVICE -c $DIGITEMP_CONF -o "%.2F")
+if [ "Z" == "Z$TEMP" ] ; then
+  echo "ERR: Error running $DIGITEMP_CMD, no temperature returned"
+  exit 3
+fi
 
 readonly MAX_WARN=75
 readonly MAX_CRIT=80
