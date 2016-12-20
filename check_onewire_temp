@@ -1,0 +1,40 @@
+#!/bin/bash
+
+exists()
+{
+  command -v "$1" >/dev/null 2>&1
+}
+# Check for programs
+if ! exists bc ; then
+  echo "ERR: bc not installed"
+  exit 3
+fi
+
+TEMP=$(digitemp_DS9097U -t 0 -q -s /dev/ttyUSB0 -c ./digitemp.conf -o "%.2F")
+
+readonly MAX_WARN=75
+readonly MAX_CRIT=80
+readonly MIN_WARN=60
+readonly MIN_CRIT=55
+
+MESSAGE="Current Temp: $TEMP"
+
+if [ $(echo "$TEMP > $MAX_CRIT" | bc) -eq 1 ] ; then
+  echo "CRIT: $MESSAGE"
+  exit 2
+fi
+if [ $(echo "$TEMP > $MAX_WARN" | bc) -eq 1 ] ; then
+  echo "WARN: $MESSAGE"
+  exit 1
+fi
+if [ $(echo "$TEMP < $MIN_CRIT" | bc) -eq 1 ] ; then
+  echo "CRIT: $MESSAGE"
+  exit 2
+fi
+if [ $(echo "$TEMP < $MIN_WARN" | bc) -eq 1 ] ; then
+  echo "WARN: $MESSAGE"
+  exit 1
+fi
+echo "OK: $MESSAGE"
+exit 0
+
