@@ -3,8 +3,7 @@
 # Local Settings - season to taste
 readonly DIGITEMP_CMD=digitemp_DS9097U         # actual digitemp command to run
 readonly SENSOR_ID=0                           # sensor ID from the config file
-readonly DIGITEMP_CONF=/root/.digitemp.conf    # digitemp config file
-readonly DIGITEMP_DEVICE=/dev/ttyUSB0          # where the sensor is attached
+readonly DIGITEMP_CONF=/etc/digitemp.conf      # digitemp config file
 
 exists()
 {
@@ -23,12 +22,8 @@ if ! [ -f $DIGITEMP_CONF ] ; then
   echo "ERR: $DIGITEMP_CONF not found"
   exit 3
 fi
-#if ! [ -f $DIGITEMP_DEVICE ] ; then
-#  echo "ERR: $DIGITEMP_DEVICE not found"
-#  exit 3
-#fi
 
-readonly TEMP=$($DIGITEMP_CMD -t $SENSOR_ID -q -s $DIGITEMP_DEVICE -c $DIGITEMP_CONF -o "%.2F")
+readonly TEMP=$($DIGITEMP_CMD -t $SENSOR_ID -q -c $DIGITEMP_CONF -o "%.2F")
 if [ "Z" == "Z$TEMP" ] ; then
   echo "ERR: Error running $DIGITEMP_CMD, no temperature returned"
   exit 3
